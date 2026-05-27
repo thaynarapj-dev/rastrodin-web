@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import type { Metadata } from 'next';
+import '../styles/index.css';
 
 export const metadata: Metadata = {
-  title: "RastroDin",
-  description: "Controle financeiro familiar",
+  title: 'RastroDin',
+  description:
+    'Track and manage daily family expenses with a mobile-responsive app designed to help users monitor spending and improve budget control.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={cn("font-sans", geist.variable)}>
+    <html lang="pt-BR">
       <body>{children}</body>
     </html>
   );
