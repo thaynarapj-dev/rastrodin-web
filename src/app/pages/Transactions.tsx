@@ -1,22 +1,22 @@
 import { Receipt, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Expense } from '../components/shared/types';
-import { ExpenseItem } from '../components/shared/ExpenseItem';
+import { Transaction } from '../interfaces/Transaction';
+import { TransactionItem } from '../components/shared/TransactionItem';
 import { CategoryFilter } from '../components/shared/CategoryFilter';
 
 interface TransactionsProps {
-  expenses: Expense[];
-  onDeleteExpense: (id: string) => void;
+  transactions: Transaction[];
+  onDeleteTransaction: (id: string) => void;
   isMobile?: boolean;
 }
 
-export function Transactions({ expenses, onDeleteExpense, isMobile = false }: TransactionsProps) {
+export function Transactions({ transactions, onDeleteTransaction, isMobile = false }: TransactionsProps) {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredExpenses = expenses.filter(expense => {
-    const matchesCategory = filterCategory === 'all' || expense.category === filterCategory;
-    const matchesSearch = expense.description.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredTransactions = transactions.filter(transaction => {
+    const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
+    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -47,20 +47,20 @@ export function Transactions({ expenses, onDeleteExpense, isMobile = false }: Tr
           <div className="flex items-center justify-between">
             <h2 className="text-foreground flex items-center gap-2">
               <Receipt className="w-5 h-5 text-primary" />
-              {filteredExpenses.length} Transações
+              {filteredTransactions.length} Transações
             </h2>
           </div>
 
-          {filteredExpenses.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="bg-card rounded-xl p-12 text-center border border-border shadow-sm">
               <p className="text-muted-foreground">Nenhuma transação encontrada</p>
             </div>
           ) : (
-            filteredExpenses.map(expense => (
-              <ExpenseItem
-                key={expense.id}
-                expense={expense}
-                onDelete={onDeleteExpense}
+            filteredTransactions.map(transaction => (
+              <TransactionItem
+                key={transaction.id}
+                transaction={transaction}
+                onDelete={onDeleteTransaction}
               />
             ))
           )}

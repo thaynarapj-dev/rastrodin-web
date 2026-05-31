@@ -1,24 +1,24 @@
 import { useState } from 'react';
 import { DollarSign, Plus, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
-import { Expense } from '../components/shared/types';
+import { Transaction } from '../interfaces/Transaction';
 import { BalanceCard } from '../components/shared/BalanceCard';
 import { CategoryFilter } from '../components/shared/CategoryFilter';
-import { ExpenseItem } from '../components/shared/ExpenseItem';
+import { TransactionItem } from '../components/shared/TransactionItem';
 import { TransactionForm, TransactionFormData } from '../components/shared/TransactionForm';
 
 interface DashboardProps {
-  expenses: Expense[];
-  onAddExpense: (expense: Expense) => void;
-  onDeleteExpense: (id: string) => void;
+  transactions: Transaction[];
+  onAddTransaction: (transaction: Transaction) => void;
+  onDeleteTransaction: (id: string) => void;
   isMobile?: boolean;
 }
 
-export function Dashboard({ expenses, onAddExpense, onDeleteExpense, isMobile = false }: DashboardProps) {
+export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction, isMobile = false }: DashboardProps) {
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
   const handleSubmit = (formData: TransactionFormData) => {
-    const newExpense: Expense = {
+    const newTransaction: Transaction = {
       id: Date.now().toString(),
       description: formData.description,
       amount: parseFloat(formData.amount),
@@ -26,23 +26,23 @@ export function Dashboard({ expenses, onAddExpense, onDeleteExpense, isMobile = 
       date: formData.date,
       type: formData.type
     };
-    onAddExpense(newExpense);
+    onAddTransaction(newTransaction);
     setShowForm(false);
   };
 
-  const filteredExpenses = filterCategory === 'all'
-    ? expenses
-    : expenses.filter(e => e.category === filterCategory);
+  const filteredTransactions = filterCategory === 'all'
+    ? transactions
+    : transactions.filter(e => e.category === filterCategory);
 
-  const totalIncome = expenses
+  const totalIncome = transactions
     .filter(e => e.type === 'income')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const totalExpense = expenses
+  const totalOutcome = transactions
     .filter(e => e.type === 'expense')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const balance = totalIncome - totalExpense;
+  const balance = totalIncome - totalOutcome;
 
   return (
     <div className="flex-1 overflow-auto">
@@ -58,7 +58,7 @@ export function Dashboard({ expenses, onAddExpense, onDeleteExpense, isMobile = 
           <BalanceCard
             icon={TrendingDown}
             label="Despesas"
-            value={totalExpense}
+            value={totalOutcome}
             type="expense"
           />
           <BalanceCard
@@ -79,16 +79,16 @@ export function Dashboard({ expenses, onAddExpense, onDeleteExpense, isMobile = 
             <Calendar className="w-5 h-5 text-primary" />
             Transações Recentes
           </h2>
-          {filteredExpenses.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="bg-card rounded-xl p-8 text-center border border-border shadow-sm">
               <p className="text-muted-foreground">Nenhuma transação encontrada</p>
             </div>
           ) : (
-            filteredExpenses.slice(0, 10).map(expense => (
-              <ExpenseItem
-                key={expense.id}
-                expense={expense}
-                onDelete={onDeleteExpense}
+            filteredTransactions.slice(0, 10).map(transaction => (
+              <TransactionItem
+                key={transaction.id}
+                transaction={transaction}
+                onDelete={onDeleteTransaction}
               />
             ))
           )}

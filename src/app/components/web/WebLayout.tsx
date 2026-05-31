@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { DollarSign, Plus, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
-import { Expense } from '../shared/types';
+import { Transaction } from '@/app/interfaces/Transaction';
 import { BalanceCard } from '../shared/BalanceCard';
 import { CategoryFilter } from '../shared/CategoryFilter';
-import { ExpenseItem } from '../shared/ExpenseItem';
+import { TransactionItem } from '../shared/TransactionItem';
 import { TransactionForm, TransactionFormData } from '../shared/TransactionForm';
 
 interface WebLayoutProps {
-  expenses: Expense[];
-  onAddExpense: (expense: Expense) => void;
-  onDeleteExpense: (id: string) => void;
+  transactions: Transaction[];
+  onAddTransaction: (transaction: Transaction) => void;
+  onDeleteTransaction: (id: string) => void;
 }
 
-export function WebLayout({ expenses, onAddExpense, onDeleteExpense }: WebLayoutProps) {
+export function WebLayout({ transactions, onAddTransaction, onDeleteTransaction }: WebLayoutProps) {
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
   const handleSubmit = (formData: TransactionFormData) => {
-    const newExpense: Expense = {
+    const newTransaction: Transaction = {
       id: Date.now().toString(),
       description: formData.description,
       amount: parseFloat(formData.amount),
@@ -25,23 +25,23 @@ export function WebLayout({ expenses, onAddExpense, onDeleteExpense }: WebLayout
       date: formData.date,
       type: formData.type
     };
-    onAddExpense(newExpense);
+    onAddTransaction(newTransaction);
     setShowForm(false);
   };
 
-  const filteredExpenses = filterCategory === 'all'
-    ? expenses
-    : expenses.filter(e => e.category === filterCategory);
+  const filteredTransactions = filterCategory === 'all'
+    ? transactions
+    : transactions.filter(e => e.category === filterCategory);
 
-  const totalIncome = expenses
+  const totalIncome = transactions
     .filter(e => e.type === 'income')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const totalExpense = expenses
+  const totalOutcome = transactions
     .filter(e => e.type === 'expense')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const balance = totalIncome - totalExpense;
+  const balance = totalIncome - totalOutcome;
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,7 +81,7 @@ export function WebLayout({ expenses, onAddExpense, onDeleteExpense }: WebLayout
           <BalanceCard
             icon={TrendingDown}
             label="Despesas"
-            value={totalExpense}
+            value={totalOutcome}
             type="expense"
           />
           <BalanceCard
@@ -102,17 +102,17 @@ export function WebLayout({ expenses, onAddExpense, onDeleteExpense }: WebLayout
             <Calendar className="w-6 h-6 text-primary" />
             Transações
           </h2>
-          {filteredExpenses.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="bg-card rounded-xl p-12 text-center border border-border shadow-sm">
               <p className="text-muted-foreground text-lg">Nenhuma transação encontrada</p>
             </div>
           ) : (
             <div className="grid gap-4">
-              {filteredExpenses.map(expense => (
-                <ExpenseItem
-                  key={expense.id}
-                  expense={expense}
-                  onDelete={onDeleteExpense}
+              {filteredTransactions.map(transaction => (
+                <TransactionItem
+                  key={transaction.id}
+                  transaction={transaction}
+                  onDelete={onDeleteTransaction}
                 />
               ))}
             </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Expense } from './components/shared/types';
+import { Transaction } from './interfaces/Transaction';
 import { Sidebar } from './components/shared/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { Profile } from './pages/Profile';
@@ -9,36 +9,18 @@ import { Settings } from './pages/Settings';
 import { Reports } from './pages/Reports';
 import { Transactions } from './pages/Transactions';
 import { DollarSign } from 'lucide-react';
+import {
+  createTransaction,
+  deleteTransaction,
+  getTransactions,
+} from '@/app/service';
 
 export default function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [expenses, setExpenses] = useState<Expense[]>([
-    {
-      id: '1',
-      description: 'Supermercado',
-      amount: 250.50,
-      category: 'Alimentação',
-      date: '2026-05-27',
-      type: 'expense'
-    },
-    {
-      id: '2',
-      description: 'Salário',
-      amount: 5000,
-      category: 'Outros',
-      date: '2026-05-01',
-      type: 'income'
-    },
-    {
-      id: '3',
-      description: 'Gasolina',
-      amount: 180,
-      category: 'Transporte',
-      date: '2026-05-25',
-      type: 'expense'
-    }
-  ]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(true);
+  const [transactionsError, setTransactionsError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -51,12 +33,58 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleAddExpense = (expense: Expense) => {
-    setExpenses([expense, ...expenses]);
+  useEffect(() => {
+    async function loadTransactions() {
+      try {
+        setIsLoadingTransactions(true);
+        setTransactionsError(null);
+        const apiTransactions = await getTransactions();
+        setTransactions(apiTransactions);
+      } catch (error) {
+        setTransactionsError(
+          error instanceof Error
+            ? error.message
+            : 'Não foi possível carregar as transações.',
+        );
+      } finally {
+        setIsLoadingTransactions(false);
+      }
+    }
+
+    loadTransactions();
+  }, []);
+
+  const handleAddTransaction = async (transaction: Transaction) => {
+    try {
+      setTransactionsError(null);
+      const savedTransaction = await createTransaction(transaction);
+      setTransactions((currentTransactions) => [
+        savedTransaction || transaction,
+        ...currentTransactions,
+      ]);
+    } catch (error) {
+      setTransactionsError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível adicionar a transação.',
+      );
+    }
   };
 
-  const handleDeleteExpense = (id: string) => {
-    setExpenses(expenses.filter(e => e.id !== id));
+  const handleDeleteTransaction = async (id: string) => {
+    try {
+      setTransactionsError(null);
+      await deleteTransaction(id);
+      setTransactions((currentTransactions) =>
+        currentTransactions.filter((transaction) => transaction.id !== id),
+      );
+    } catch (error) {
+      setTransactionsError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível remover a transação.',
+      );
+    }
   };
 
   const renderPage = () => {
@@ -64,17 +92,17 @@ export default function App() {
       case 'dashboard':
         return (
           <Dashboard
-            expenses={expenses}
-            onAddExpense={handleAddExpense}
-            onDeleteExpense={handleDeleteExpense}
+            transactions={transactions}
+            onAddTransaction={handleAddTransaction}
+            onDeleteTransaction={handleDeleteTransaction}
             isMobile={isMobile}
           />
         );
       case 'transactions':
         return (
           <Transactions
-            expenses={expenses}
-            onDeleteExpense={handleDeleteExpense}
+            transactions={transactions}
+            onDeleteTransaction={handleDeleteTransaction}
             isMobile={isMobile}
           />
         );
@@ -87,9 +115,9 @@ export default function App() {
       default:
         return (
           <Dashboard
-            expenses={expenses}
-            onAddExpense={handleAddExpense}
-            onDeleteExpense={handleDeleteExpense}
+            transactions={transactions}
+            onAddTransaction={handleAddTransaction}
+            onDeleteTransaction={handleDeleteTransaction}
             isMobile={isMobile}
           />
         );
@@ -114,7 +142,16 @@ export default function App() {
             <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} isMobile={true} />
           </div>
         </header>
-        {renderPage()}
+        {transactionsError && (
+          <div className="bg-destructive px-4 py-2 text-sm text-destructive-foreground">
+            {transactionsError}
+          </div>
+        )}
+        {isLoadingTransactions ? (
+          <main className="p-6 text-muted-foreground">Carregando...</main>
+        ) : (
+          renderPage()
+        )}
       </div>
     );
   }
@@ -122,7 +159,18 @@ export default function App() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-      {renderPage()}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {transactionsError && (
+          <div className="bg-destructive px-6 py-2 text-sm text-destructive-foreground">
+            {transactionsError}
+          </div>
+        )}
+        {isLoadingTransactions ? (
+          <main className="p-8 text-muted-foreground">Carregando...</main>
+        ) : (
+          renderPage()
+        )}
+      </div>
     </div>
   );
 }

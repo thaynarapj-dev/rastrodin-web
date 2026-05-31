@@ -1,5 +1,8 @@
 import { Filter } from 'lucide-react';
 import { categories } from './types';
+import { getCategories } from '@/app/service/routes/categories';
+import React from 'react';
+import { Category } from '@/app/interfaces/Categories';
 
 interface CategoryFilterProps {
   selected: string;
@@ -7,6 +10,15 @@ interface CategoryFilterProps {
 }
 
 export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
+  const [categoriesList, setCategoriesList] = React.useState<Category[]>([]);
+
+  React.useEffect(() => {
+    getCategories().then(categories => {
+      setCategoriesList(categories);
+    });
+  }, []);
+
+
   return (
     <div className="mb-6">
       <div className="flex items-center gap-2 mb-3">
@@ -24,17 +36,17 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
         >
           Todas
         </button>
-        {categories.map(cat => (
+        {categoriesList.map(({ id, name }) => (
           <button
-            key={cat}
-            onClick={() => onSelect(cat)}
+            key={id}
+            onClick={() => onSelect(id)}
             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-              selected === cat
+              selected === id 
                 ? 'bg-primary text-primary-foreground shadow-sm'
                 : 'bg-card text-card-foreground border border-border hover:bg-secondary'
             }`}
           >
-            {cat}
+            {name}
           </button>
         ))}
       </div>
