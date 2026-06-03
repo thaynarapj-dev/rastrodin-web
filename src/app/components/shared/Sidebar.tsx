@@ -18,6 +18,9 @@ const menuItems = [
 export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const isActivePage = (page: string) =>
+    currentPage === page || (currentPage === 'categories' && page === 'settings');
+
   const handleNavigate = (page: string) => {
     onNavigate(page);
     if (isMobile) setIsOpen(false);
@@ -66,7 +69,7 @@ export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarPr
                 <nav className="flex-1 p-4 space-y-2">
                   {menuItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = currentPage === item.id;
+                    const isActive = isActivePage(item.id);
                     return (
                       <button
                         key={item.id}
@@ -119,7 +122,7 @@ export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarPr
       <nav className="flex-1 p-4 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPage === item.id;
+          const isActive = isActivePage(item.id);
           return (
             <button
               key={item.id}

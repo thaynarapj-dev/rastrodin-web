@@ -1,8 +1,8 @@
 import { Filter } from 'lucide-react';
-import { categories } from './types';
 import { getCategories } from '@/app/service/routes/categories';
 import React from 'react';
 import { Category } from '@/app/interfaces/Categories';
+import { categories as defaultCategories } from './types';
 
 interface CategoryFilterProps {
   selected: string;
@@ -11,10 +11,14 @@ interface CategoryFilterProps {
 
 export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
   const [categoriesList, setCategoriesList] = React.useState<Category[]>([]);
+  const filterCategories =
+    categoriesList.length > 0
+      ? categoriesList.map(({ id, name }) => ({ id, name }))
+      : defaultCategories.map((name) => ({ id: name, name }));
 
   React.useEffect(() => {
     getCategories().then(categories => {
-      setCategoriesList(categories);
+      setCategoriesList(Array.isArray(categories) ? categories : []);
     });
   }, []);
 
@@ -36,7 +40,7 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
         >
           Todas
         </button>
-        {categoriesList.map(({ id, name }) => (
+        {filterCategories.map(({ id, name }) => (
           <button
             key={id}
             onClick={() => onSelect(id)}

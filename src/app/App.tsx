@@ -8,6 +8,7 @@ import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
 import { Reports } from './pages/Reports';
 import { Transactions } from './pages/Transactions';
+import { CategoriesSettings } from './pages/CategoriesSettings';
 import { DollarSign } from 'lucide-react';
 import {
   createTransaction,
@@ -111,7 +112,14 @@ export default function App() {
       case 'profile':
         return <Profile isMobile={isMobile} />;
       case 'settings':
-        return <Settings isMobile={isMobile} />;
+        return <Settings isMobile={isMobile} onNavigate={setCurrentPage} />;
+      case 'categories':
+        return (
+          <CategoriesSettings
+            isMobile={isMobile}
+            onBack={() => setCurrentPage('settings')}
+          />
+        );
       default:
         return (
           <Dashboard
