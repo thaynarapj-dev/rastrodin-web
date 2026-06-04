@@ -1,19 +1,19 @@
 import {
   ArrowLeft,
-  Banknote,
   CircleDollarSign,
-  CreditCard,
-  Landmark,
   Pencil,
   Plus,
-  QrCode,
   Save,
   Trash2,
-  Wallet,
   X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import {
+  getPaymentMethodIcon,
+  paymentMethodTypes,
+  translatePaymentMethodType,
+} from '../components/shared/icons';
 import {
   PaymentMethod,
   PaymentMethodTypeEnum,
@@ -31,33 +31,12 @@ interface PaymentMethodsSettingsProps {
   onBack: () => void;
 }
 
-const paymentMethodTypes = [
-  { value: PaymentMethodTypeEnum.PIX, label: 'Pix', icon: QrCode },
-  { value: PaymentMethodTypeEnum.CREDIT, label: 'Crédito', icon: CreditCard },
-  { value: PaymentMethodTypeEnum.DEBIT, label: 'Débito', icon: CreditCard },
-  { value: PaymentMethodTypeEnum.CASH, label: 'Dinheiro', icon: Banknote },
-  { value: PaymentMethodTypeEnum.TRANSFER, label: 'Transferência', icon: Landmark },
-  { value: PaymentMethodTypeEnum.OTHER, label: 'Outros', icon: Wallet },
-] as const;
-
 const initialForm: PaymentMethodPayload = {
   name: '',
   type: PaymentMethodTypeEnum.PIX,
   description: '',
   active: true,
 };
-
-function getPaymentMethodType(type: PaymentMethod['type']) {
-  return paymentMethodTypes.find((paymentMethodType) => paymentMethodType.value === type);
-}
-
-function translatePaymentMethodType(type: PaymentMethod['type']) {
-  return getPaymentMethodType(type)?.label ?? 'Outros';
-}
-
-function getPaymentMethodIcon(type: PaymentMethod['type']) {
-  return getPaymentMethodType(type)?.icon ?? Wallet;
-}
 
 export function PaymentMethodsSettings({
   isMobile = false,

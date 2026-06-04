@@ -15,6 +15,7 @@ import {
   createTransaction,
   deleteTransaction,
   getTransactions,
+  sortTransactionsByOccurrence,
 } from '@/app/service';
 
 export default function App() {
@@ -41,7 +42,7 @@ export default function App() {
         setIsLoadingTransactions(true);
         setTransactionsError(null);
         const apiTransactions = await getTransactions();
-        setTransactions(apiTransactions);
+        setTransactions(sortTransactionsByOccurrence(apiTransactions));
       } catch (error) {
         setTransactionsError(
           error instanceof Error
@@ -60,10 +61,12 @@ export default function App() {
     try {
       setTransactionsError(null);
       const savedTransaction = await createTransaction(transaction);
-      setTransactions((currentTransactions) => [
-        savedTransaction || transaction,
-        ...currentTransactions,
-      ]);
+      setTransactions((currentTransactions) =>
+        sortTransactionsByOccurrence([
+          savedTransaction || transaction,
+          ...currentTransactions,
+        ]),
+      );
     } catch (error) {
       setTransactionsError(
         error instanceof Error
@@ -97,6 +100,7 @@ export default function App() {
             transactions={transactions}
             onAddTransaction={handleAddTransaction}
             onDeleteTransaction={handleDeleteTransaction}
+            onNavigate={setCurrentPage}
             isMobile={isMobile}
           />
         );
@@ -134,6 +138,7 @@ export default function App() {
             transactions={transactions}
             onAddTransaction={handleAddTransaction}
             onDeleteTransaction={handleDeleteTransaction}
+            onNavigate={setCurrentPage}
             isMobile={isMobile}
           />
         );

@@ -24,10 +24,15 @@ export function WebLayout({ transactions, onAddTransaction, onDeleteTransaction 
       amount: parseFloat(formData.amount),
       category: formData.category,
       categoryId: formData.categoryId,
+      categoryIcon: formData.categoryIcon,
+      categoryColor: formData.categoryColor,
       subcategory: formData.subcategory,
       subcategoryId: formData.subcategoryId,
+      subcategoryIcon: formData.subcategoryIcon,
+      subcategoryColor: formData.subcategoryColor,
       paymentMethod: formData.paymentMethod,
       paymentMethodId: formData.paymentMethodId,
+      paymentMethodType: formData.paymentMethodType,
       date: formData.date,
       type: formData.type
     };

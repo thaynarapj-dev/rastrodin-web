@@ -1,4 +1,5 @@
 import { Transaction } from '@/app/interfaces/Transaction';
+import { PaymentMethodTypeEnum } from '@/app/interfaces/PaymentMethods';
 import { api } from '../api';
 
 const transactionsRoute = '/transactions';
@@ -13,15 +14,21 @@ type TransactionRow = {
   subcategory_id?: string | null;
   category?: {
     name?: string | null;
+    icon?: string | null;
+    color?: string | null;
   } | null;
   subcategory?: {
     name?: string | null;
+    icon?: string | null;
+    color?: string | null;
   } | null;
   payment_method_id?: string | null;
   payments_methods?: {
     name?: string | null;
+    type?: PaymentMethodTypeEnum | null;
   } | null;
   occurred_at: string;
+  created_at?: string | null;
   type: Transaction['type'];
 };
 
@@ -36,6 +43,7 @@ function serializeTransaction(
   fallbackCategoryName = 'Sem categoria',
   fallbackSubcategoryName = '',
   fallbackPaymentMethodName = 'Sem forma de pagamento',
+  fallbackVisualData: Partial<Transaction> = {},
 ): Transaction {
   const categoryId = row.category_id ?? null;
   const subcategoryId = row.subcategory_id ?? null;
@@ -47,13 +55,39 @@ function serializeTransaction(
     amount: Number(row.amount),
     category: row.category?.name ?? fallbackCategoryName,
     categoryId,
+    categoryIcon: row.category?.icon ?? fallbackVisualData.categoryIcon ?? null,
+    categoryColor: row.category?.color ?? fallbackVisualData.categoryColor ?? null,
     subcategory: row.subcategory?.name ?? fallbackSubcategoryName,
     subcategoryId,
+    subcategoryIcon: row.subcategory?.icon ?? fallbackVisualData.subcategoryIcon ?? null,
+    subcategoryColor: row.subcategory?.color ?? fallbackVisualData.subcategoryColor ?? null,
     paymentMethod: row.payments_methods?.name ?? fallbackPaymentMethodName,
     paymentMethodId,
+    paymentMethodType: row.payments_methods?.type ?? fallbackVisualData.paymentMethodType ?? null,
     date: row.occurred_at,
+    createdAt: row.created_at ?? fallbackVisualData.createdAt ?? null,
     type: row.type,
   };
+}
+
+export function sortTransactionsByOccurrence(transactions: Transaction[]) {
+  return [...transactions].sort((currentTransaction, nextTransaction) => {
+    const currentOccurredAt = new Date(currentTransaction.date).getTime();
+    const nextOccurredAt = new Date(nextTransaction.date).getTime();
+
+    if (currentOccurredAt !== nextOccurredAt) {
+      return nextOccurredAt - currentOccurredAt;
+    }
+
+    const currentCreatedAt = currentTransaction.createdAt
+      ? new Date(currentTransaction.createdAt).getTime()
+      : 0;
+    const nextCreatedAt = nextTransaction.createdAt
+      ? new Date(nextTransaction.createdAt).getTime()
+      : 0;
+
+    return nextCreatedAt - currentCreatedAt;
+  });
 }
 
 function serializeTransactionPayload(transaction: TransactionPayload) {
@@ -72,11 +106,12 @@ export async function getTransactions() {
   const { data } = await api.get<TransactionRow[]>(transactionsRoute, {
     params: {
       select:
-        '*,category:categories!transactions_category_id_fkey(name),subcategory:categories!transactions_subcategory_id_fkey(name),payments_methods(name)',
+        '*,category:categories!transactions_category_id_fkey(name,icon,color),subcategory:categories!transactions_subcategory_id_fkey(name,icon,color),payments_methods(name,type)',
+      order: 'occurred_at.desc,created_at.desc',
     },
   });
 
-  return data.map((transaction) => serializeTransaction(transaction));
+  return sortTransactionsByOccurrence(data.map((transaction) => serializeTransaction(transaction)));
 }
 
 export async function createTransaction(transaction: TransactionPayload) {
@@ -86,7 +121,7 @@ export async function createTransaction(transaction: TransactionPayload) {
     {
       params: {
         select:
-          '*,category:categories!transactions_category_id_fkey(name),subcategory:categories!transactions_subcategory_id_fkey(name),payments_methods(name)',
+          '*,category:categories!transactions_category_id_fkey(name,icon,color),subcategory:categories!transactions_subcategory_id_fkey(name,icon,color),payments_methods(name,type)',
       },
       headers: {
         Prefer: 'return=representation',
@@ -99,6 +134,7 @@ export async function createTransaction(transaction: TransactionPayload) {
     transaction.category,
     transaction.subcategory,
     transaction.paymentMethod,
+    transaction,
   );
 }
 

@@ -1,4 +1,4 @@
-import { Receipt, Search } from 'lucide-react';
+import { DollarSign, Receipt, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Transaction } from '../interfaces/Transaction';
 import { TransactionItem } from '../components/shared/TransactionItem';
@@ -24,6 +24,11 @@ export function Transactions({ transactions, onDeleteTransaction, isMobile = fal
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+  const filteredTotal = filteredTransactions.reduce((total, transaction) => {
+    return transaction.type === 'income'
+      ? total + transaction.amount
+      : total - transaction.amount;
+  }, 0);
 
   return (
     <div className="flex-1 overflow-auto">
@@ -31,8 +36,8 @@ export function Transactions({ transactions, onDeleteTransaction, isMobile = fal
         <h1 className="text-2xl text-foreground mb-6">Todas as Transações</h1>
 
         {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
+        <div className={`mb-6 flex gap-4 ${isMobile ? 'flex-col' : 'items-start'}`}>
+          <div className="relative min-w-0 flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <input
               type="text"
@@ -42,9 +47,27 @@ export function Transactions({ transactions, onDeleteTransaction, isMobile = fal
               className="w-full bg-card border border-border rounded-lg pl-12 pr-4 py-3 text-foreground"
             />
           </div>
+          <div
+            className={`flex h-[50px] items-center justify-between gap-4 rounded-lg border border-border bg-card px-4 shadow-sm ${
+              isMobile ? 'w-full' : 'w-72 shrink-0'
+            }`}
+          >
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 text-accent">
+                <DollarSign className="h-5 w-5" />
+              </span>
+              <span className="text-sm">Total</span>
+            </div>
+            <span
+              className={`whitespace-nowrap text-lg ${
+                filteredTotal >= 0 ? 'text-primary' : 'text-destructive'
+              }`}
+            >
+              R$ {filteredTotal.toFixed(2)}
+            </span>
+          </div>
         </div>
 
-        {/* Filter */}
         <CategoryFilter
           selected={filterCategory}
           selectedSubcategory={filterSubcategory}

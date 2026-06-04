@@ -1,61 +1,15 @@
 import {
   ArrowLeft,
-  Banknote,
-  BookOpen,
-  Briefcase,
-  Building2,
-  Bus,
-  Car,
   CircleDollarSign,
-  Coffee,
-  Coins,
-  CreditCard,
-  Dog,
-  Droplets,
-  Dumbbell,
-  FileText,
-  Film,
-  Fuel,
-  Gamepad2,
-  Gift,
-  GraduationCap,
-  Hammer,
-  Heart,
-  HeartPulse,
-  Home,
-  Laptop,
-  Leaf,
-  Lightbulb,
-  MapPin,
-  Music,
-  Package,
-  Paintbrush,
-  Plane,
   Pencil,
-  Phone,
   Plus,
-  Receipt,
   Save,
-  Scissors,
-  Shirt,
-  Shield,
-  ShoppingBag,
-  ShoppingCart,
-  Smartphone,
-  Store,
-  Tag,
-  Theater,
   Trash2,
-  Truck,
-  Tv,
-  Utensils,
-  Wrench,
   X,
-  Zap,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import { categoryIcons, getCategoryIcon } from '../components/shared/icons';
 import { Category, CategoryTypeEnum } from '../interfaces/Categories';
 import {
   createCategory,
@@ -97,63 +51,6 @@ const categoryColors = [
   '#adb5bd',
 ];
 
-const categoryIcons: Array<{ id: string; label: string; icon: LucideIcon }> = [
-  { id: 'tag', label: 'Tag', icon: Tag },
-  { id: 'utensils', label: 'Alimentação', icon: Utensils },
-  { id: 'coffee', label: 'Café', icon: Coffee },
-  { id: 'car', label: 'Transporte', icon: Car },
-  { id: 'bus', label: 'Ônibus', icon: Bus },
-  { id: 'fuel', label: 'Combustível', icon: Fuel },
-  { id: 'truck', label: 'Entrega', icon: Truck },
-  { id: 'home', label: 'Moradia', icon: Home },
-  { id: 'building', label: 'Condomínio', icon: Building2 },
-  { id: 'lightbulb', label: 'Energia', icon: Lightbulb },
-  { id: 'droplets', label: 'Água', icon: Droplets },
-  { id: 'zap', label: 'Internet', icon: Zap },
-  { id: 'film', label: 'Lazer', icon: Film },
-  { id: 'music', label: 'Música', icon: Music },
-  { id: 'theater', label: 'Eventos', icon: Theater },
-  { id: 'tv', label: 'Streaming', icon: Tv },
-  { id: 'briefcase', label: 'Trabalho', icon: Briefcase },
-  { id: 'banknote', label: 'Receita', icon: Banknote },
-  { id: 'coins', label: 'Moedas', icon: Coins },
-  { id: 'credit-card', label: 'Cartão', icon: CreditCard },
-  { id: 'receipt', label: 'Conta', icon: Receipt },
-  { id: 'shopping-bag', label: 'Compras', icon: ShoppingBag },
-  { id: 'shopping-cart', label: 'Mercado', icon: ShoppingCart },
-  { id: 'store', label: 'Loja', icon: Store },
-  { id: 'heart-pulse', label: 'Saúde', icon: HeartPulse },
-  { id: 'heart', label: 'Bem-estar', icon: Heart },
-  { id: 'graduation-cap', label: 'Educação', icon: GraduationCap },
-  { id: 'book-open', label: 'Livros', icon: BookOpen },
-  { id: 'plane', label: 'Viagem', icon: Plane },
-  { id: 'map-pin', label: 'Passeio', icon: MapPin },
-  { id: 'smartphone', label: 'Celular', icon: Smartphone },
-  { id: 'phone', label: 'Telefone', icon: Phone },
-  { id: 'laptop', label: 'Tecnologia', icon: Laptop },
-  { id: 'shirt', label: 'Roupas', icon: Shirt },
-  { id: 'gift', label: 'Presentes', icon: Gift },
-  { id: 'dumbbell', label: 'Academia', icon: Dumbbell },
-  { id: 'gamepad', label: 'Jogos', icon: Gamepad2 },
-  { id: 'wrench', label: 'Serviços', icon: Wrench },
-  { id: 'hammer', label: 'Manutenção', icon: Hammer },
-  { id: 'paintbrush', label: 'Casa e decoração', icon: Paintbrush },
-  { id: 'scissors', label: 'Beleza', icon: Scissors },
-  { id: 'shield', label: 'Seguros', icon: Shield },
-  { id: 'file-text', label: 'Documentos', icon: FileText },
-  { id: 'package', label: 'Assinaturas', icon: Package },
-  { id: 'leaf', label: 'Natureza', icon: Leaf },
-  { id: 'dog', label: 'Pet', icon: Dog },
-];
-
-const categoryIconMap = categoryIcons.reduce<Record<string, LucideIcon>>(
-  (iconMap, categoryIcon) => {
-    iconMap[categoryIcon.id] = categoryIcon.icon;
-    return iconMap;
-  },
-  {},
-);
-
 const initialForm: CategoryPayload = {
   name: '',
   type: CategoryTypeEnum.EXPENSE,
@@ -162,12 +59,6 @@ const initialForm: CategoryPayload = {
   parent_id: null,
   active: true,
 };
-
-function getCategoryIcon(icon: string | null) {
-  if (!icon) return Tag;
-
-  return categoryIconMap[icon as keyof typeof categoryIconMap] ?? Tag;
-}
 
 function translateType(type: Category['type']) {
   return type === CategoryTypeEnum.INCOME ? 'Receita' : 'Despesa';

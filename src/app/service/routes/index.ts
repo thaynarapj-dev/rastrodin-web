@@ -19,4 +19,5 @@ export {
   deleteTransaction,
   transactionRoutes,
   getTransactions,
+  sortTransactionsByOccurrence,
 } from './transaction';

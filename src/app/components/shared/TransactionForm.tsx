@@ -1,17 +1,27 @@
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Category } from '@/app/interfaces/Categories';
-import { PaymentMethod } from '@/app/interfaces/PaymentMethods';
+import { PaymentMethod, PaymentMethodTypeEnum } from '@/app/interfaces/PaymentMethods';
 import { getCategories, getPaymentMethods } from '@/app/service';
+import {
+  getCategoryIcon,
+  getPaymentMethodIcon,
+  translatePaymentMethodType,
+} from './icons';
 
 export interface TransactionFormData {
   description: string;
   amount: string;
   category: string;
   categoryId: string | null;
+  categoryIcon: string | null;
+  categoryColor: string | null;
   subcategory: string;
   subcategoryId: string | null;
+  subcategoryIcon: string | null;
+  subcategoryColor: string | null;
   paymentMethod: string;
   paymentMethodId: string | null;
+  paymentMethodType: PaymentMethodTypeEnum | null;
   date: string;
   type: 'income' | 'expense';
 }
@@ -31,10 +41,15 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
     amount: '',
     category: 'Sem categoria',
     categoryId: null,
+    categoryIcon: null,
+    categoryColor: null,
     subcategory: '',
     subcategoryId: null,
+    subcategoryIcon: null,
+    subcategoryColor: null,
     paymentMethod: 'Sem forma de pagamento',
     paymentMethodId: null,
+    paymentMethodType: null,
     date: new Date().toISOString().split('T')[0],
     type: 'expense'
   });
@@ -61,8 +76,12 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
             ...currentFormData,
             category: firstParentCategory.name,
             categoryId: firstParentCategory.id,
+            categoryIcon: firstParentCategory.icon,
+            categoryColor: firstParentCategory.color,
             subcategory: '',
             subcategoryId: null,
+            subcategoryIcon: null,
+            subcategoryColor: null,
           };
         });
       })
@@ -83,6 +102,7 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
             ...currentFormData,
             paymentMethod: firstPaymentMethod.name,
             paymentMethodId: firstPaymentMethod.id,
+            paymentMethodType: firstPaymentMethod.type,
           };
         });
       })
@@ -109,8 +129,12 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
       type,
       category: firstParentCategory?.name ?? 'Sem categoria',
       categoryId: firstParentCategory?.id ?? null,
+      categoryIcon: firstParentCategory?.icon ?? null,
+      categoryColor: firstParentCategory?.color ?? null,
       subcategory: '',
       subcategoryId: null,
+      subcategoryIcon: null,
+      subcategoryColor: null,
     });
   };
 
@@ -123,8 +147,12 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
       ...formData,
       category: selectedCategory?.name ?? 'Sem categoria',
       categoryId: selectedCategory?.id ?? null,
+      categoryIcon: selectedCategory?.icon ?? null,
+      categoryColor: selectedCategory?.color ?? null,
       subcategory: '',
       subcategoryId: null,
+      subcategoryIcon: null,
+      subcategoryColor: null,
     });
   };
 
@@ -139,8 +167,12 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
       ...formData,
       category: selectedParentCategory?.name ?? 'Sem categoria',
       categoryId: selectedParentCategory?.id ?? null,
+      categoryIcon: selectedParentCategory?.icon ?? null,
+      categoryColor: selectedParentCategory?.color ?? null,
       subcategory: selectedSubcategory?.name ?? '',
       subcategoryId: selectedSubcategory?.id ?? null,
+      subcategoryIcon: selectedSubcategory?.icon ?? null,
+      subcategoryColor: selectedSubcategory?.color ?? null,
     });
   };
 
@@ -149,6 +181,15 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
     onSubmit(formData);
   };
 
+  const selectedParentCategory = parentCategories.find(
+    (category) => category.id === selectedParentCategoryId,
+  );
+  const selectedSubcategory = subcategories.find(
+    (category) => category.id === selectedSubcategoryId,
+  );
+  const selectedPaymentMethod = paymentMethods.find(
+    (paymentMethod) => paymentMethod.id === formData.paymentMethodId,
+  );
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4">
       <div className="flex gap-2">
@@ -213,6 +254,19 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
             <option key={category.id} value={category.id}>{category.name}</option>
           ))}
         </select>
+        {selectedParentCategory && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+            <span
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
+              style={{ backgroundColor: selectedParentCategory.color ?? '#1a4d2e' }}
+            >
+              {createElement(getCategoryIcon(selectedParentCategory.icon), {
+                className: 'h-4 w-4',
+              })}
+            </span>
+            <span className="truncate">{selectedParentCategory.name}</span>
+          </div>
+        )}
       </div>
 
       {subcategories.length > 0 && (
@@ -228,6 +282,19 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
               <option key={category.id} value={category.id}>{category.name}</option>
             ))}
           </select>
+          {selectedSubcategory && (
+            <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+              <span
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white"
+                style={{ backgroundColor: selectedSubcategory.color ?? '#1a4d2e' }}
+              >
+                {createElement(getCategoryIcon(selectedSubcategory.icon), {
+                  className: 'h-4 w-4',
+                })}
+              </span>
+              <span className="truncate">{selectedSubcategory.name}</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -244,6 +311,7 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
               ...formData,
               paymentMethod: selectedPaymentMethod?.name ?? 'Sem forma de pagamento',
               paymentMethodId: selectedPaymentMethod?.id ?? null,
+              paymentMethodType: selectedPaymentMethod?.type ?? null,
             });
           }}
           className="w-full bg-input-background border border-border rounded-lg px-4 py-3 text-foreground"
@@ -253,6 +321,18 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
             <option key={paymentMethod.id} value={paymentMethod.id}>{paymentMethod.name}</option>
           ))}
         </select>
+        {selectedPaymentMethod && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              {createElement(getPaymentMethodIcon(selectedPaymentMethod.type), {
+                className: 'h-4 w-4',
+              })}
+            </span>
+            <span className="truncate">
+              {selectedPaymentMethod.name} • {translatePaymentMethodType(selectedPaymentMethod.type)}
+            </span>
+          </div>
+        )}
       </div>
 
       <div>

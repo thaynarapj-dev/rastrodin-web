@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { DollarSign, Plus, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
 import { Transaction } from '../interfaces/Transaction';
 import { BalanceCard } from '../components/shared/BalanceCard';
-import { CategoryFilter } from '../components/shared/CategoryFilter';
 import { TransactionItem } from '../components/shared/TransactionItem';
 import { TransactionForm, TransactionFormData } from '../components/shared/TransactionForm';
 
@@ -10,13 +9,18 @@ interface DashboardProps {
   transactions: Transaction[];
   onAddTransaction: (transaction: Transaction) => void;
   onDeleteTransaction: (id: string) => void;
+  onNavigate?: (page: string) => void;
   isMobile?: boolean;
 }
 
-export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction, isMobile = false }: DashboardProps) {
+export function Dashboard({
+  transactions,
+  onAddTransaction,
+  onDeleteTransaction,
+  onNavigate,
+  isMobile = false,
+}: DashboardProps) {
   const [showForm, setShowForm] = useState(false);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
 
   const handleSubmit = (formData: TransactionFormData) => {
     const newTransaction: Transaction = {
@@ -25,10 +29,15 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
       amount: parseFloat(formData.amount),
       category: formData.category,
       categoryId: formData.categoryId,
+      categoryIcon: formData.categoryIcon,
+      categoryColor: formData.categoryColor,
       subcategory: formData.subcategory,
       subcategoryId: formData.subcategoryId,
+      subcategoryIcon: formData.subcategoryIcon,
+      subcategoryColor: formData.subcategoryColor,
       paymentMethod: formData.paymentMethod,
       paymentMethodId: formData.paymentMethodId,
+      paymentMethodType: formData.paymentMethodType,
       date: formData.date,
       type: formData.type
     };
@@ -36,13 +45,7 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
     setShowForm(false);
   };
 
-  const filteredTransactions = filterCategory === 'all'
-    ? transactions
-    : transactions.filter((transaction) =>
-        filterSubcategory === 'all'
-          ? transaction.categoryId === filterCategory
-          : transaction.subcategoryId === filterSubcategory,
-      );
+  const recentTransactions = transactions.slice(0, 10);
 
   const totalIncome = transactions
     .filter(e => e.type === 'income')
@@ -80,26 +83,26 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
           />
         </div>
 
-        {/* Filter */}
-        <CategoryFilter
-          selected={filterCategory}
-          selectedSubcategory={filterSubcategory}
-          onSelect={setFilterCategory}
-          onSelectSubcategory={setFilterSubcategory}
-        />
-
         {/* Transactions */}
         <div className="space-y-3">
-          <h2 className="text-foreground flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            Transações Recentes
-          </h2>
-          {filteredTransactions.length === 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-foreground flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Últimas transações
+            </h2>
+            <button
+              onClick={() => onNavigate?.('transactions')}
+              className="rounded-lg border border-border bg-card px-4 py-2 text-sm text-card-foreground transition-colors hover:bg-secondary"
+            >
+              Ver todas
+            </button>
+          </div>
+          {recentTransactions.length === 0 ? (
             <div className="bg-card rounded-xl p-8 text-center border border-border shadow-sm">
               <p className="text-muted-foreground">Nenhuma transação encontrada</p>
             </div>
           ) : (
-            filteredTransactions.slice(0, 10).map(transaction => (
+            recentTransactions.map(transaction => (
               <TransactionItem
                 key={transaction.id}
                 transaction={transaction}

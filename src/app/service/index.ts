@@ -13,5 +13,6 @@ export {
   deleteTransaction,
   transactionRoutes,
   getTransactions,
+  sortTransactionsByOccurrence,
 } from './routes';
 export type { CategoryPayload, PaymentMethodPayload } from './routes';
