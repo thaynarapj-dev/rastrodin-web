@@ -145,7 +145,8 @@ export default function App() {
       <div className="min-h-screen bg-background">
         {/* Mobile Header with Menu */}
         <header className="bg-card border-b border-border sticky top-0 z-10 shadow-sm">
-          <div className="px-4 py-3 flex items-center justify-between">
+          <div className="px-4 py-3 flex items-center gap-3">
+            <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} isMobile={true} />
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
                 <DollarSign className="w-6 h-6 text-primary-foreground" />
@@ -155,7 +156,6 @@ export default function App() {
                 <p className="text-xs text-muted-foreground">Mobile</p>
               </div>
             </div>
-            <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} isMobile={true} />
           </div>
         </header>
         {transactionsError && (
