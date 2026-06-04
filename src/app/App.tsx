@@ -9,6 +9,7 @@ import { Settings } from './pages/Settings';
 import { Reports } from './pages/Reports';
 import { Transactions } from './pages/Transactions';
 import { CategoriesSettings } from './pages/CategoriesSettings';
+import { PaymentMethodsSettings } from './pages/PaymentMethodsSettings';
 import { DollarSign } from 'lucide-react';
 import {
   createTransaction,
@@ -116,6 +117,13 @@ export default function App() {
       case 'categories':
         return (
           <CategoriesSettings
+            isMobile={isMobile}
+            onBack={() => setCurrentPage('settings')}
+          />
+        );
+      case 'payment-methods':
+        return (
+          <PaymentMethodsSettings
             isMobile={isMobile}
             onBack={() => setCurrentPage('settings')}
           />

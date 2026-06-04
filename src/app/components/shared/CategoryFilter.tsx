@@ -2,19 +2,30 @@ import { Filter } from 'lucide-react';
 import { getCategories } from '@/app/service/routes/categories';
 import React from 'react';
 import { Category } from '@/app/interfaces/Categories';
-import { categories as defaultCategories } from './types';
 
 interface CategoryFilterProps {
   selected: string;
+  selectedSubcategory?: string;
   onSelect: (category: string) => void;
+  onSelectSubcategory?: (subcategory: string) => void;
 }
 
-export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
+export function CategoryFilter({
+  selected,
+  selectedSubcategory = 'all',
+  onSelect,
+  onSelectSubcategory,
+}: CategoryFilterProps) {
   const [categoriesList, setCategoriesList] = React.useState<Category[]>([]);
-  const filterCategories =
-    categoriesList.length > 0
-      ? categoriesList.map(({ id, name }) => ({ id, name }))
-      : defaultCategories.map((name) => ({ id: name, name }));
+  const parentCategories = categoriesList
+    .filter((category) => !category.parent_id)
+    .map(({ id, name }) => ({ id, name }));
+  const selectedCategorySubcategories =
+    selected === 'all'
+      ? []
+      : categoriesList
+          .filter((category) => category.parent_id === selected)
+          .map(({ id, name }) => ({ id, name }));
 
   React.useEffect(() => {
     getCategories().then(categories => {
@@ -31,7 +42,10 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
       </div>
       <div className="flex gap-2 overflow-x-auto pb-2">
         <button
-          onClick={() => onSelect('all')}
+          onClick={() => {
+            onSelect('all');
+            onSelectSubcategory?.('all');
+          }}
           className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
             selected === 'all'
               ? 'bg-primary text-primary-foreground shadow-sm'
@@ -40,10 +54,13 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
         >
           Todas
         </button>
-        {filterCategories.map(({ id, name }) => (
+        {parentCategories.map(({ id, name }) => (
           <button
             key={id}
-            onClick={() => onSelect(id)}
+            onClick={() => {
+              onSelect(id);
+              onSelectSubcategory?.('all');
+            }}
             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
               selected === id 
                 ? 'bg-primary text-primary-foreground shadow-sm'
@@ -54,6 +71,34 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
           </button>
         ))}
       </div>
+
+      {selectedCategorySubcategories.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => onSelectSubcategory?.('all')}
+            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+              selectedSubcategory === 'all'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'bg-card text-card-foreground border border-border hover:bg-secondary'
+            }`}
+          >
+            Todas as subcategorias
+          </button>
+          {selectedCategorySubcategories.map(({ id, name }) => (
+            <button
+              key={id}
+              onClick={() => onSelectSubcategory?.(id)}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                selectedSubcategory === id
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'bg-card text-card-foreground border border-border hover:bg-secondary'
+              }`}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,9 +5,13 @@ export {
   deleteCategory,
   getCategories,
   updateCategory,
+  createPaymentMethod,
+  deletePaymentMethod,
+  getPaymentMethods,
+  updatePaymentMethod,
   createTransaction,
   deleteTransaction,
   transactionRoutes,
   getTransactions,
 } from './routes';
-export type { CategoryPayload } from './routes';
+export type { CategoryPayload, PaymentMethodPayload } from './routes';

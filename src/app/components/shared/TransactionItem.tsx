@@ -12,7 +12,11 @@ export function TransactionItem({ transaction, onDelete }: TransactionItemProps)
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <Tag className="w-4 h-4 text-primary flex-shrink-0" />
-          <span className="text-sm text-muted-foreground truncate">{transaction.category}</span>
+          <span className="text-sm text-muted-foreground truncate">
+            {transaction.category}
+            {transaction.subcategory ? ` > ${transaction.subcategory}` : ''}
+            {transaction.paymentMethod ? ` • ${transaction.paymentMethod}` : ''}
+          </span>
         </div>
         <p className="text-card-foreground truncate">{transaction.description}</p>
         <p className="text-sm text-muted-foreground">

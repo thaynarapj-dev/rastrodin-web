@@ -12,10 +12,15 @@ interface TransactionsProps {
 
 export function Transactions({ transactions, onDeleteTransaction, isMobile = false }: TransactionsProps) {
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredTransactions = transactions.filter(transaction => {
-    const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
+    const matchesCategory =
+      filterCategory === 'all' ||
+      (filterSubcategory === 'all'
+        ? transaction.categoryId === filterCategory
+        : transaction.subcategoryId === filterSubcategory);
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
@@ -40,7 +45,12 @@ export function Transactions({ transactions, onDeleteTransaction, isMobile = fal
         </div>
 
         {/* Filter */}
-        <CategoryFilter selected={filterCategory} onSelect={setFilterCategory} />
+        <CategoryFilter
+          selected={filterCategory}
+          selectedSubcategory={filterSubcategory}
+          onSelect={setFilterCategory}
+          onSelectSubcategory={setFilterSubcategory}
+        />
 
         {/* Transactions List */}
         <div className="space-y-3">

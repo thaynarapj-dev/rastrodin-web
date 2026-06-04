@@ -9,6 +9,6 @@ export interface Category {
     type: CategoryTypeEnum;
     color: string | null;
     icon: string | null;
-    parent_id?: string;
+    parent_id?: string | null;
     active: boolean;
 }

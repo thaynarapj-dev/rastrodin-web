@@ -19,7 +19,9 @@ export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarPr
   const [isOpen, setIsOpen] = useState(false);
 
   const isActivePage = (page: string) =>
-    currentPage === page || (currentPage === 'categories' && page === 'settings');
+    currentPage === page ||
+    ((currentPage === 'categories' || currentPage === 'payment-methods') &&
+      page === 'settings');
 
   const handleNavigate = (page: string) => {
     onNavigate(page);

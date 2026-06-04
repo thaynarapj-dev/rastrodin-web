@@ -1,6 +1,16 @@
-import { Bell, ChevronRight, Database, Lock, Moon, Palette, Shield, Tags } from 'lucide-react';
+import {
+  Bell,
+  ChevronRight,
+  CreditCard,
+  Database,
+  Lock,
+  Moon,
+  Palette,
+  Shield,
+  Tags,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { getCategories } from '../service';
+import { getCategories, getPaymentMethods } from '../service';
 
 interface SettingsProps {
   isMobile?: boolean;
@@ -12,11 +22,16 @@ export function Settings({ isMobile = false, onNavigate }: SettingsProps) {
   const [darkMode, setDarkMode] = useState(false);
   const [twoFactor, setTwoFactor] = useState(false);
   const [categoriesCount, setCategoriesCount] = useState(0);
+  const [paymentMethodsCount, setPaymentMethodsCount] = useState(0);
 
   useEffect(() => {
     getCategories()
       .then((categories) => setCategoriesCount(categories.length))
       .catch(() => setCategoriesCount(0));
+
+    getPaymentMethods()
+      .then((paymentMethods) => setPaymentMethodsCount(paymentMethods.length))
+      .catch(() => setPaymentMethodsCount(0));
   }, []);
 
   return (
@@ -96,7 +111,7 @@ export function Settings({ isMobile = false, onNavigate }: SettingsProps) {
                 </div>
                 <div>
                   <h3 className="text-foreground">Personalização</h3>
-                  <p className="text-sm text-muted-foreground">Organize suas categorias</p>
+                  <p className="text-sm text-muted-foreground">Organize suas preferências</p>
                 </div>
               </div>
 
@@ -111,6 +126,22 @@ export function Settings({ isMobile = false, onNavigate }: SettingsProps) {
                       <span className="block text-foreground">Categorias</span>
                       <span className="block text-sm text-muted-foreground">
                         {categoriesCount} categorias cadastradas
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 shrink-0 text-muted-foreground" />
+                </button>
+
+                <button
+                  onClick={() => onNavigate?.('payment-methods')}
+                  className="w-full flex items-center justify-between gap-3 p-3 bg-background rounded-lg hover:bg-secondary transition-colors"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <CreditCard className="w-5 h-5 shrink-0 text-primary" />
+                    <div className="min-w-0 text-left">
+                      <span className="block text-foreground">Formas de pagamento</span>
+                      <span className="block text-sm text-muted-foreground">
+                        {paymentMethodsCount} formas cadastradas
                       </span>
                     </div>
                   </div>

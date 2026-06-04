@@ -16,6 +16,7 @@ interface DashboardProps {
 export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction, isMobile = false }: DashboardProps) {
   const [showForm, setShowForm] = useState(false);
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
 
   const handleSubmit = (formData: TransactionFormData) => {
     const newTransaction: Transaction = {
@@ -23,6 +24,11 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
       description: formData.description,
       amount: parseFloat(formData.amount),
       category: formData.category,
+      categoryId: formData.categoryId,
+      subcategory: formData.subcategory,
+      subcategoryId: formData.subcategoryId,
+      paymentMethod: formData.paymentMethod,
+      paymentMethodId: formData.paymentMethodId,
       date: formData.date,
       type: formData.type
     };
@@ -32,7 +38,11 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
 
   const filteredTransactions = filterCategory === 'all'
     ? transactions
-    : transactions.filter(e => e.category === filterCategory);
+    : transactions.filter((transaction) =>
+        filterSubcategory === 'all'
+          ? transaction.categoryId === filterCategory
+          : transaction.subcategoryId === filterSubcategory,
+      );
 
   const totalIncome = transactions
     .filter(e => e.type === 'income')
@@ -71,7 +81,12 @@ export function Dashboard({ transactions, onAddTransaction, onDeleteTransaction,
         </div>
 
         {/* Filter */}
-        <CategoryFilter selected={filterCategory} onSelect={setFilterCategory} />
+        <CategoryFilter
+          selected={filterCategory}
+          selectedSubcategory={filterSubcategory}
+          onSelect={setFilterCategory}
+          onSelectSubcategory={setFilterSubcategory}
+        />
 
         {/* Transactions */}
         <div className="space-y-3">

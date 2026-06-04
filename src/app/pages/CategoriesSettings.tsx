@@ -1,23 +1,62 @@
 import {
   ArrowLeft,
   Banknote,
+  BookOpen,
   Briefcase,
+  Building2,
+  Bus,
   Car,
   CircleDollarSign,
+  Coffee,
+  Coins,
+  CreditCard,
+  Dog,
+  Droplets,
+  Dumbbell,
+  FileText,
   Film,
+  Fuel,
+  Gamepad2,
+  Gift,
+  GraduationCap,
+  Hammer,
+  Heart,
+  HeartPulse,
   Home,
+  Laptop,
+  Leaf,
+  Lightbulb,
+  MapPin,
+  Music,
+  Package,
+  Paintbrush,
+  Plane,
   Pencil,
+  Phone,
   Plus,
+  Receipt,
   Save,
+  Scissors,
+  Shirt,
+  Shield,
+  ShoppingBag,
+  ShoppingCart,
+  Smartphone,
+  Store,
   Tag,
+  Theater,
   Trash2,
+  Truck,
+  Tv,
   Utensils,
+  Wrench,
   X,
+  Zap,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Category, CategoryTypeEnum } from '../interfaces/Categories';
-import { categories as defaultCategoryNames } from '../components/shared/types';
 import {
   createCategory,
   deleteCategory,
@@ -31,65 +70,98 @@ interface CategoriesSettingsProps {
   onBack: () => void;
 }
 
-const categoryColors = ['#1a4d2e', '#2d6a4f', '#52b788', '#f4c430', '#e76f51', '#457b9d'];
-
-const categoryIcons = [
-  { id: 'tag', label: 'Tag', icon: Tag },
-  { id: 'utensils', label: 'Alimentação', icon: Utensils },
-  { id: 'car', label: 'Transporte', icon: Car },
-  { id: 'home', label: 'Moradia', icon: Home },
-  { id: 'film', label: 'Lazer', icon: Film },
-  { id: 'briefcase', label: 'Trabalho', icon: Briefcase },
-  { id: 'banknote', label: 'Receita', icon: Banknote },
+const categoryColors = [
+  '#1a4d2e',
+  '#2d6a4f',
+  '#52b788',
+  '#95d5b2',
+  '#f4c430',
+  '#f77f00',
+  '#e76f51',
+  '#d62828',
+  '#c9184a',
+  '#ff5d8f',
+  '#7b2cbf',
+  '#5a189a',
+  '#4361ee',
+  '#457b9d',
+  '#00b4d8',
+  '#0096c7',
+  '#2a9d8f',
+  '#6a994e',
+  '#8d99ae',
+  '#495057',
+  '#6f4e37',
+  '#bc6c25',
+  '#f2cc8f',
+  '#adb5bd',
 ];
 
-const categoryIconMap = {
-  tag: Tag,
-  utensils: Utensils,
-  car: Car,
-  home: Home,
-  film: Film,
-  briefcase: Briefcase,
-  banknote: Banknote,
-} as const;
+const categoryIcons: Array<{ id: string; label: string; icon: LucideIcon }> = [
+  { id: 'tag', label: 'Tag', icon: Tag },
+  { id: 'utensils', label: 'Alimentação', icon: Utensils },
+  { id: 'coffee', label: 'Café', icon: Coffee },
+  { id: 'car', label: 'Transporte', icon: Car },
+  { id: 'bus', label: 'Ônibus', icon: Bus },
+  { id: 'fuel', label: 'Combustível', icon: Fuel },
+  { id: 'truck', label: 'Entrega', icon: Truck },
+  { id: 'home', label: 'Moradia', icon: Home },
+  { id: 'building', label: 'Condomínio', icon: Building2 },
+  { id: 'lightbulb', label: 'Energia', icon: Lightbulb },
+  { id: 'droplets', label: 'Água', icon: Droplets },
+  { id: 'zap', label: 'Internet', icon: Zap },
+  { id: 'film', label: 'Lazer', icon: Film },
+  { id: 'music', label: 'Música', icon: Music },
+  { id: 'theater', label: 'Eventos', icon: Theater },
+  { id: 'tv', label: 'Streaming', icon: Tv },
+  { id: 'briefcase', label: 'Trabalho', icon: Briefcase },
+  { id: 'banknote', label: 'Receita', icon: Banknote },
+  { id: 'coins', label: 'Moedas', icon: Coins },
+  { id: 'credit-card', label: 'Cartão', icon: CreditCard },
+  { id: 'receipt', label: 'Conta', icon: Receipt },
+  { id: 'shopping-bag', label: 'Compras', icon: ShoppingBag },
+  { id: 'shopping-cart', label: 'Mercado', icon: ShoppingCart },
+  { id: 'store', label: 'Loja', icon: Store },
+  { id: 'heart-pulse', label: 'Saúde', icon: HeartPulse },
+  { id: 'heart', label: 'Bem-estar', icon: Heart },
+  { id: 'graduation-cap', label: 'Educação', icon: GraduationCap },
+  { id: 'book-open', label: 'Livros', icon: BookOpen },
+  { id: 'plane', label: 'Viagem', icon: Plane },
+  { id: 'map-pin', label: 'Passeio', icon: MapPin },
+  { id: 'smartphone', label: 'Celular', icon: Smartphone },
+  { id: 'phone', label: 'Telefone', icon: Phone },
+  { id: 'laptop', label: 'Tecnologia', icon: Laptop },
+  { id: 'shirt', label: 'Roupas', icon: Shirt },
+  { id: 'gift', label: 'Presentes', icon: Gift },
+  { id: 'dumbbell', label: 'Academia', icon: Dumbbell },
+  { id: 'gamepad', label: 'Jogos', icon: Gamepad2 },
+  { id: 'wrench', label: 'Serviços', icon: Wrench },
+  { id: 'hammer', label: 'Manutenção', icon: Hammer },
+  { id: 'paintbrush', label: 'Casa e decoração', icon: Paintbrush },
+  { id: 'scissors', label: 'Beleza', icon: Scissors },
+  { id: 'shield', label: 'Seguros', icon: Shield },
+  { id: 'file-text', label: 'Documentos', icon: FileText },
+  { id: 'package', label: 'Assinaturas', icon: Package },
+  { id: 'leaf', label: 'Natureza', icon: Leaf },
+  { id: 'dog', label: 'Pet', icon: Dog },
+];
+
+const categoryIconMap = categoryIcons.reduce<Record<string, LucideIcon>>(
+  (iconMap, categoryIcon) => {
+    iconMap[categoryIcon.id] = categoryIcon.icon;
+    return iconMap;
+  },
+  {},
+);
 
 const initialForm: CategoryPayload = {
   name: '',
   type: CategoryTypeEnum.EXPENSE,
   color: categoryColors[0],
   icon: 'tag',
+  parent_id: null,
   active: true,
 };
-
-const fallbackIncomeCategories = ['Salário', 'Investimentos'];
-
-const fallbackIconByName: Record<string, string> = {
-  Alimentação: 'utensils',
-  Transporte: 'car',
-  Moradia: 'home',
-  Lazer: 'film',
-  Salário: 'banknote',
-  Investimentos: 'briefcase',
-};
-
-const fallbackCategories: Category[] = [
-  ...defaultCategoryNames.map((name, index) => ({
-    id: `fallback-expense-${name}`,
-    name,
-    type: CategoryTypeEnum.EXPENSE,
-    color: categoryColors[index % categoryColors.length],
-    icon: fallbackIconByName[name] ?? 'tag',
-    active: true,
-  })),
-  ...fallbackIncomeCategories.map((name, index) => ({
-    id: `fallback-income-${name}`,
-    name,
-    type: CategoryTypeEnum.INCOME,
-    color: categoryColors[(index + 2) % categoryColors.length],
-    icon: fallbackIconByName[name] ?? 'banknote',
-    active: true,
-  })),
-];
 
 function getCategoryIcon(icon: string | null) {
   if (!icon) return Tag;
@@ -109,6 +181,7 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -133,12 +206,28 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
   }, []);
 
   const filteredCategories = useMemo(
-    () => {
-      const availableCategories = categories.length > 0 ? categories : fallbackCategories;
-
-      return availableCategories.filter((category) => category.type === selectedType);
-    },
+    () => categories.filter((category) => category?.type === selectedType),
     [categories, selectedType],
+  );
+
+  const parentCategoryOptions = useMemo(
+    () =>
+      categories.filter(
+        (category) =>
+          category?.type === formData.type &&
+          category.id !== editingCategoryId &&
+          !category.parent_id,
+      ),
+    [categories, editingCategoryId, formData.type],
+  );
+
+  const categoryNameById = useMemo(
+    () =>
+      categories.reduce<Record<string, string>>((categoryMap, category) => {
+        categoryMap[category.id] = category.name;
+        return categoryMap;
+      }, {}),
+    [categories],
   );
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -159,6 +248,10 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
       const savedCategory = editingCategoryId
         ? await updateCategory(editingCategoryId, categoryPayload)
         : await createCategory(categoryPayload);
+
+      if (!savedCategory) {
+        throw new Error('A API não retornou a categoria salva.');
+      }
 
       setCategories((currentCategories) =>
         editingCategoryId
@@ -189,6 +282,7 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
       type: category.type,
       color: category.color ?? categoryColors[0],
       icon: category.icon ?? 'tag',
+      parent_id: category.parent_id ?? null,
       active: category.active,
     });
     setError(null);
@@ -225,8 +319,12 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
   const resetForm = () => {
     setEditingCategoryId(null);
     setFormData({ ...initialForm, type: selectedType });
+    setIsIconPickerOpen(false);
     setError(null);
   };
+
+  const selectedCategoryIcon = categoryIcons.find((icon) => icon.id === formData.icon) ?? categoryIcons[0];
+  const SelectedCategoryIcon = selectedCategoryIcon.icon;
 
   return (
     <div className="flex-1 overflow-auto">
@@ -299,7 +397,6 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
                 <div className="space-y-2">
                   {filteredCategories.map((category) => {
                     const Icon = getCategoryIcon(category.icon);
-                    const isFallbackCategory = category.id.startsWith('fallback-');
 
                     return (
                       <div
@@ -316,7 +413,9 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
                           <div className="min-w-0">
                             <p className="truncate text-foreground">{category.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {isFallbackCategory ? 'Sugestão padrão' : translateType(category.type)}
+                              {category.parent_id
+                                ? `Dentro de ${categoryNameById[category.parent_id] ?? 'categoria'}`
+                                : translateType(category.type)}
                             </p>
                           </div>
                         </div>
@@ -324,15 +423,14 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
                         <div className="flex shrink-0 items-center gap-1">
                           <button
                             onClick={() => handleEditCategory(category)}
-                            disabled={isFallbackCategory}
-                            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+                            className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
                             aria-label={`Editar ${category.name}`}
                           >
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteCategory(category)}
-                            disabled={isFallbackCategory || deletingCategoryId === category.id}
+                            disabled={deletingCategoryId === category.id}
                             className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-red-50 hover:text-destructive disabled:opacity-50"
                             aria-label={`Excluir ${category.name}`}
                           >
@@ -372,7 +470,13 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, type: CategoryTypeEnum.EXPENSE })}
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        type: CategoryTypeEnum.EXPENSE,
+                        parent_id: null,
+                      })
+                    }
                     className={`flex-1 rounded-lg py-3 transition-colors ${
                       formData.type === CategoryTypeEnum.EXPENSE
                         ? 'bg-primary text-primary-foreground'
@@ -383,7 +487,13 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, type: CategoryTypeEnum.INCOME })}
+                    onClick={() =>
+                      setFormData({
+                        ...formData,
+                        type: CategoryTypeEnum.INCOME,
+                        parent_id: null,
+                      })
+                    }
                     className={`flex-1 rounded-lg py-3 transition-colors ${
                       formData.type === CategoryTypeEnum.INCOME
                         ? 'bg-primary text-primary-foreground'
@@ -396,15 +506,38 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
               </div>
 
               <div>
+                <label className="mb-2 block text-card-foreground">Categoria principal</label>
+                <select
+                  value={formData.parent_id ?? ''}
+                  onChange={(event) =>
+                    setFormData({
+                      ...formData,
+                      parent_id: event.target.value || null,
+                    })
+                  }
+                  className="w-full rounded-lg border border-border bg-input-background px-4 py-3 text-foreground"
+                >
+                  <option value="">Nenhuma, categoria principal</option>
+                  {parentCategoryOptions.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="mb-2 block text-card-foreground">Cor</label>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-8 gap-2 rounded-lg bg-background p-3">
                   {categoryColors.map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setFormData({ ...formData, color })}
-                      className={`h-10 rounded-lg border-2 transition-transform ${
-                        formData.color === color ? 'border-foreground scale-105' : 'border-transparent'
+                      className={`h-8 rounded-md border-2 shadow-sm transition-transform ${
+                        formData.color === color
+                          ? 'scale-110 border-foreground'
+                          : 'border-white hover:scale-105'
                       }`}
                       style={{ backgroundColor: color }}
                       aria-label={`Selecionar cor ${color}`}
@@ -415,22 +548,48 @@ export function CategoriesSettings({ isMobile = false, onBack }: CategoriesSetti
 
               <div>
                 <label className="mb-2 block text-card-foreground">Ícone</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {categoryIcons.map(({ id, label, icon: Icon }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, icon: id })}
-                      className={`flex h-11 items-center justify-center rounded-lg border transition-colors ${
-                        formData.icon === id
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-border bg-background text-muted-foreground hover:text-primary'
-                      }`}
-                      aria-label={label}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </button>
-                  ))}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsIconPickerOpen((isOpen) => !isOpen)}
+                    className="flex w-full items-center justify-between rounded-lg border border-border bg-input-background px-4 py-3 text-foreground transition-colors hover:bg-secondary"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                        <SelectedCategoryIcon className="h-5 w-5" />
+                      </span>
+                      <span className="truncate">{selectedCategoryIcon.label}</span>
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      {isIconPickerOpen ? 'Fechar' : 'Trocar'}
+                    </span>
+                  </button>
+
+                  {isIconPickerOpen && (
+                    <div className="absolute left-0 right-0 top-full z-20 mt-2 rounded-lg border border-border bg-card p-3 shadow-lg">
+                      <div className="grid max-h-56 grid-cols-5 gap-2 overflow-y-auto pr-1">
+                        {categoryIcons.map(({ id, label, icon: Icon }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => {
+                              setFormData({ ...formData, icon: id });
+                              setIsIconPickerOpen(false);
+                            }}
+                            className={`flex h-11 items-center justify-center rounded-lg border transition-colors ${
+                              formData.icon === id
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border bg-background text-muted-foreground hover:text-primary'
+                            }`}
+                            aria-label={label}
+                            title={label}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
