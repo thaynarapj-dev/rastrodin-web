@@ -21,3 +21,7 @@ export {
   getTransactions,
   sortTransactionsByOccurrence,
 } from './transaction';
+
+export {
+  ensureDefaultSpace,
+} from './spaces';

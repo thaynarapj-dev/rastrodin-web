@@ -17,5 +17,6 @@ export interface Transaction {
   paymentMethodType?: PaymentMethodTypeEnum | null;
   date: string;
   createdAt?: string | null;
+  spaceId?: string | null;
   type: 'income' | 'expense';
 }

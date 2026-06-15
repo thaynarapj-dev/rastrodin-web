@@ -4,6 +4,7 @@ import { useState } from 'react';
 interface SidebarProps {
   currentPage: string;
   onNavigate: (page: string) => void;
+  onSignOut: () => void;
   isMobile?: boolean;
 }
 
@@ -15,7 +16,7 @@ const menuItems = [
   { id: 'settings', label: 'Configurações', icon: Settings },
 ];
 
-export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarProps) {
+export function Sidebar({ currentPage, onNavigate, onSignOut, isMobile = false }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const isActivePage = (page: string) =>
@@ -91,7 +92,10 @@ export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarPr
 
                 {/* Footer */}
                 <div className="p-4 border-t border-border">
-                  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-red-50 transition-colors">
+                  <button
+                    onClick={onSignOut}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-red-50 transition-colors"
+                  >
                     <LogOut className="w-5 h-5" />
                     <span>Sair</span>
                   </button>
@@ -144,7 +148,10 @@ export function Sidebar({ currentPage, onNavigate, isMobile = false }: SidebarPr
 
       {/* Footer */}
       <div className="p-4 border-t border-border">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-red-50 transition-colors">
+        <button
+          onClick={onSignOut}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-destructive hover:bg-red-50 transition-colors"
+        >
           <LogOut className="w-5 h-5" />
           <span>Sair</span>
         </button>

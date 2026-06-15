@@ -12,5 +12,6 @@ export interface PaymentMethod {
   name: string;
   type: PaymentMethodTypeEnum;
   description: string | null;
+  space_id?: string | null;
   active: boolean;
 }

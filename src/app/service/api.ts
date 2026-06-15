@@ -6,6 +6,12 @@ export const api = axios.create({
   headers: serviceConfig.defaultHeaders,
 });
 
+export function setApiAuthToken(accessToken: string | null) {
+  api.defaults.headers.common.Authorization = accessToken
+    ? `Bearer ${accessToken}`
+    : serviceConfig.defaultHeaders.Authorization;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {

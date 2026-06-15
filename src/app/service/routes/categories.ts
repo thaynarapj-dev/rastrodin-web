@@ -1,4 +1,5 @@
 import { Category } from "@/app/interfaces/Categories";
+import { getActiveSpaceFilter, withActiveSpace } from "../active-space";
 import { api } from "../api";
 
 const categoriesRoute = '/categories';
@@ -51,13 +52,19 @@ function normalizeCategoryResponse(response: CategoryResponse) {
 }
 
 export async function getCategories() {
-  const { data } = await api.get<CategoryResponse>(categoriesRoute, {});
+  const activeSpaceFilter = getActiveSpaceFilter();
+
+  if (!activeSpaceFilter) return [];
+
+  const { data } = await api.get<CategoryResponse>(categoriesRoute, {
+    params: activeSpaceFilter,
+  });
 
   return normalizeCategoriesResponse(data);
 }
 
 export async function createCategory(category: CategoryPayload) {
-  const { data } = await api.post<CategoryResponse>(categoriesRoute, category, {
+  const { data } = await api.post<CategoryResponse>(categoriesRoute, withActiveSpace(category), {
     headers: {
       Prefer: 'return=representation',
     },
@@ -67,8 +74,12 @@ export async function createCategory(category: CategoryPayload) {
 }
 
 export async function updateCategory(id: string, category: CategoryPayload) {
+  const activeSpaceFilter = getActiveSpaceFilter();
   const { data } = await api.patch<CategoryResponse>(categoriesRoute, category, {
-    params: { id },
+    params: {
+      id: `eq.${id}`,
+      ...(activeSpaceFilter ?? {}),
+    },
     headers: {
       Prefer: 'return=representation',
     },
@@ -78,7 +89,11 @@ export async function updateCategory(id: string, category: CategoryPayload) {
 }
 
 export async function deleteCategory(id: string) {
+  const activeSpaceFilter = getActiveSpaceFilter();
   await api.delete(categoriesRoute, {
-    params: { id },
+    params: {
+      id: `eq.${id}`,
+      ...(activeSpaceFilter ?? {}),
+    },
   });
 }

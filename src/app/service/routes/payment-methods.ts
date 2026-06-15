@@ -1,4 +1,5 @@
 import { PaymentMethod } from '@/app/interfaces/PaymentMethods';
+import { getActiveSpaceFilter, withActiveSpace } from '../active-space';
 import { api } from '../api';
 
 const paymentMethodsRoute = '/payments_methods';
@@ -54,27 +55,41 @@ function normalizePaymentMethodResponse(response: PaymentMethodResponse) {
 }
 
 export async function getPaymentMethods() {
-  const { data } = await api.get<PaymentMethodResponse>(paymentMethodsRoute, {});
+  const activeSpaceFilter = getActiveSpaceFilter();
+
+  if (!activeSpaceFilter) return [];
+
+  const { data } = await api.get<PaymentMethodResponse>(paymentMethodsRoute, {
+    params: activeSpaceFilter,
+  });
 
   return normalizePaymentMethodsResponse(data);
 }
 
 export async function createPaymentMethod(paymentMethod: PaymentMethodPayload) {
-  const { data } = await api.post<PaymentMethodResponse>(paymentMethodsRoute, paymentMethod, {
-    headers: {
-      Prefer: 'return=representation',
+  const { data } = await api.post<PaymentMethodResponse>(
+    paymentMethodsRoute,
+    withActiveSpace(paymentMethod),
+    {
+      headers: {
+        Prefer: 'return=representation',
+      },
     },
-  });
+  );
 
   return normalizePaymentMethodResponse(data);
 }
 
 export async function updatePaymentMethod(id: string, paymentMethod: PaymentMethodPayload) {
+  const activeSpaceFilter = getActiveSpaceFilter();
   const { data } = await api.patch<PaymentMethodResponse>(
     paymentMethodsRoute,
     paymentMethod,
     {
-      params: { id },
+      params: {
+        id: `eq.${id}`,
+        ...(activeSpaceFilter ?? {}),
+      },
       headers: {
         Prefer: 'return=representation',
       },
@@ -85,7 +100,11 @@ export async function updatePaymentMethod(id: string, paymentMethod: PaymentMeth
 }
 
 export async function deletePaymentMethod(id: string) {
+  const activeSpaceFilter = getActiveSpaceFilter();
   await api.delete(paymentMethodsRoute, {
-    params: { id },
+    params: {
+      id: `eq.${id}`,
+      ...(activeSpaceFilter ?? {}),
+    },
   });
 }

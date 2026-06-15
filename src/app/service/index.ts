@@ -14,5 +14,6 @@ export {
   transactionRoutes,
   getTransactions,
   sortTransactionsByOccurrence,
+  ensureDefaultSpace,
 } from './routes';
 export type { CategoryPayload, PaymentMethodPayload } from './routes';

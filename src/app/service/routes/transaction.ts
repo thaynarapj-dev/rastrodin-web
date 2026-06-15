@@ -1,5 +1,6 @@
 import { Transaction } from '@/app/interfaces/Transaction';
 import { PaymentMethodTypeEnum } from '@/app/interfaces/PaymentMethods';
+import { getActiveSpaceFilter, getActiveSpaceId } from '../active-space';
 import { api } from '../api';
 
 const transactionsRoute = '/transactions';
@@ -23,6 +24,7 @@ type TransactionRow = {
     color?: string | null;
   } | null;
   payment_method_id?: string | null;
+  space_id?: string | null;
   payments_methods?: {
     name?: string | null;
     type?: PaymentMethodTypeEnum | null;
@@ -66,6 +68,7 @@ function serializeTransaction(
     paymentMethodType: row.payments_methods?.type ?? fallbackVisualData.paymentMethodType ?? null,
     date: row.occurred_at,
     createdAt: row.created_at ?? fallbackVisualData.createdAt ?? null,
+    spaceId: row.space_id ?? fallbackVisualData.spaceId ?? null,
     type: row.type,
   };
 }
@@ -98,16 +101,22 @@ function serializeTransactionPayload(transaction: TransactionPayload) {
     category_id: isUuid(transaction.categoryId) ? transaction.categoryId : null,
     subcategory_id: isUuid(transaction.subcategoryId) ? transaction.subcategoryId : null,
     payment_method_id: isUuid(transaction.paymentMethodId) ? transaction.paymentMethodId : null,
+    space_id: getActiveSpaceId(),
     occurred_at: transaction.date,
   };
 }
 
 export async function getTransactions() {
+  const activeSpaceFilter = getActiveSpaceFilter();
+
+  if (!activeSpaceFilter) return [];
+
   const { data } = await api.get<TransactionRow[]>(transactionsRoute, {
     params: {
       select:
         '*,category:categories!transactions_category_id_fkey(name,icon,color),subcategory:categories!transactions_subcategory_id_fkey(name,icon,color),payments_methods(name,type)',
       order: 'occurred_at.desc,created_at.desc',
+      ...activeSpaceFilter,
     },
   });
 
@@ -139,9 +148,11 @@ export async function createTransaction(transaction: TransactionPayload) {
 }
 
 export async function deleteTransaction(id: string) {
+  const activeSpaceFilter = getActiveSpaceFilter();
   await api.delete(transactionsRoute, {
     params: {
       id: `eq.${id}`,
+      ...(activeSpaceFilter ?? {}),
     },
   });
 }
